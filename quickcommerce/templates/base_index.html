@@ -18,6 +18,9 @@
             margin-top: 11rem !important;
         }
     }
+.location-input-container{
+  max-width:60% !important;
+}
  </style>
   <!-- Additional CSS goes here -->
   {% endblock %}
@@ -34,34 +37,37 @@
         <a class="navbar-brand" href="/">
           <img src="{%  static 'img/logo.svg'  %}" alt="Rapparel Logo" width="70" height="70">
         </a>
-        <form class="form-inline" id="location-form">
+        <div class="location-input-container">
+          <!-- Normal input field for location -->
           <div class="input-group">
             <div class="input-group-prepend">
-              <span class="input-group-text text-sm" id="location-icon">
+              <span class="input-group-text text-sm" id="location-icon-mobile">
                 <i class="bi bi-geo-alt-fill"></i>
               </span>
             </div>
-          <!-- Input for manual address typing or displaying detected location -->
-          <input id="location-input" class="form-control mr-sm-2" type="search" placeholder="Detecting location..." aria-label="Location">
-        </div>
-
-          <!-- Dropdown for saved addresses (hidden by default) -->
-          <select id="location-select" class="form-control d-none">
-            <!-- Dynamically populated with saved addresses -->
-          </select>
-          <div id="location-suggestions" class="list-group mt-2 d-none"></div>
+            <input type="text" id="location-input-mobile" placeholder="Location detected" class="form-control" disabled>
+            <select id="location-select-mobile" class="form-control d-none">
+            </select>
+            <div class="input-group-append">
+              <span class="input-group-text text-sm" id="search-icon-mobile">
+                <i class="fas fa-search"></i>
+              </span>
+              <span class="input-group-text text-sm d-none" id="select-icon-mobile">
+                <i class="fas fa-list"></i>
+              </span>
+            </div>
+            
+          </div>        
+         
+          
+          <div id="location-suggestions-mobile"  style="position: absolute;" class="list-group d-none"></div>
   
-          <!-- Optional: Button to trigger form submission -->
-          <!-- <button id="submit-location" class="btn btn-primary btn-sm ml-2" type="submit">Submit</button> -->
-        </form>
-        
-        <!-- Message container for detected location -->
-        <div id="location-msg" class="mt-2 text-success"></div>
+      </div>
       </div>
 
       <form id="search-form" class="form-inline position-relative" style="flex-grow: 1;">
         <input id="search-bar-mobile" class="form-control" type="text" placeholder="Search products" aria-label="Search">
-        <i class="bi bi-search search-icon"></i>
+        <i class="bi bi-search search-icon-desktop"></i>
     </form>
     
     <!-- Search results container -->
@@ -75,48 +81,54 @@
   <nav class="navbar desktop-nav navbar-light bg-white justify-content-between content-container">
     <div class="d-flex align-items-center">
       <a class="navbar-brand" href="/">
-        <img src="{%  static 'img/logo.svg'  %}"  alt="Rapparel Logo" width="100" height="100">
+        <img src="{%  static 'img/logo.svg'  %}"  alt="Rapparel Logo" width="70" height="70">
       </a>
-      <form class="form-inline" id="location-form">
+      
+    
+       <div class="location-input-container">
+        <!-- Normal input field for location -->
         <div class="input-group">
           <div class="input-group-prepend">
             <span class="input-group-text text-sm" id="location-icon-desktop">
               <i class="bi bi-geo-alt-fill"></i>
             </span>
           </div>
-          <!-- Input for manual address typing or displaying detected location -->
-          <input id="location-input-desktop" class="form-control mr-sm-2" type="search" placeholder="Detecting location..." aria-label="Location">
-        </div>
-        <!-- Input for manual address typing or displaying detected location -->
-      
-        <!-- Dropdown for saved addresses (hidden by default) -->
-        <select id="location-select-desktop" class="form-control d-none">
-          <!-- Dynamically populated with saved addresses -->
-        </select>
-        <div id="location-suggestions" class="list-group mt-2 d-none"></div>
+          <input type="text" id="location-input-desktop" placeholder="Location detected" class="form-control" disabled>
+          <select id="location-select-desktop" class="form-control d-none">
+          </select>
+          <div class="input-group-append">
+            <span class="input-group-text text-sm" id="search-icon-desktop">
+              <i class="fas fa-search"></i>
+            </span>
+            <span class="input-group-text text-sm d-none" id="select-icon-desktop">
+              <i class="fas fa-list"></i>
+            </span>
+          </div>
+          
+        </div>        
+       
+        
+        <div id="location-suggestions-desktop"  style="position: absolute; " class="list-group d-none"></div>
 
-        <!-- Optional: Button to trigger form submission -->
-        <!-- <button id="submit-location" class="btn btn-primary btn-sm ml-2" type="submit">Submit</button> -->
-      </form>
+    </div>
+
       
-      <!-- Message container for detected location -->
-      <div id="location-msg" class="mt-2 text-success"></div>
     </div>
 
     <div class="d-flex align-items-center">
-      <form id="search-form" class="form-inline position-relative mr-2" style="flex-grow: 1;">
+      <form id="search-form" class="form-inline d-none position-relative mr-2" style="flex-grow: 1;">
         <input id="search-bar" class="form-control" type="text" placeholder="Search products" aria-label="Search">
-        <i class="bi bi-search search-icon"></i>
+        <i class="bi bi-search search-icon-desktop"></i>
     </form>
     
     <!-- Search results container -->
-    <div id="search-results" style=" position: absolute; background-color: white; width: 100%; z-index: 1000;">
+    <div id="search-results" class="d-none" style=" position: absolute; background-color: white; width: 100%; z-index: 1000;">
         <!-- Search results will be dynamically inserted here -->
     </div>
       
-      <a href="/wishlist/" class="mr-3"><i class="bi bi-heart"></i></a>
-      <a href="/checkout/" class="mr-3"><i class="bi bi-bag"></i></a>
-      <a href="/myaccount/"><i class="bi bi-person-circle"></i></a>
+      <a href="{% url 'customer_wishlist' %}" class="mr-3"><i class="bi bi-heart"></i></a>
+      <a href="{% url 'cart_checkout' %}" class="mr-3"><i class="bi bi-bag"></i></a>
+      <a href="{% url 'customer_past_orders' %}"><i class="bi bi-person-circle"></i></a>
     </div>
   </nav>
 
@@ -210,7 +222,7 @@
 
   <script>
  $(document).ready(function () {
-
+/***
   var typingTimer;
     var doneTypingInterval = 300; // Time in ms (0.3 seconds)
     var $input = $('#location-input-desktop');
@@ -380,11 +392,84 @@ $('#location-select, #location-select-desktop').on('change', function() {
 
     
 
+***/
 
+    var typingTimer;
+    var doneTypingInterval = 300; // Time in ms (0.3 seconds)
+    var $input = $('#location-input-desktop');
+    var $suggestions = $('#location-suggestions-desktop');
+    var $dropdown = $('#location-select-desktop');
+    var currentAddress = '';
 
+    // Initially fetch real-time location when page loads
+    detectRealTimeLocation();
 
+    // On keyup, start the countdown for the user typing
+    $input.on('keyup', function () {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    });
 
+    // On keydown, clear the countdown
+    $input.on('keydown', function () {
+        clearTimeout(typingTimer);
+    });
 
+    // User is done typing, fetch suggestions
+    function doneTyping() {
+        var query = $input.val();
+
+        // If the input is empty, clear the suggestions
+        if (query.length === 0) {
+            $suggestions.empty().addClass('d-none');
+            return;
+        }
+
+        // Make an AJAX request to the Nominatim API for autocomplete suggestions
+        var apiUrl = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + query;
+
+        $.getJSON(apiUrl, function (data) {
+            // Clear previous suggestions
+            $suggestions.empty();
+
+            // If no results, show "No results found"
+            if (data.length === 0) {
+                $suggestions.append('<div class="list-group-item list-group-item-action">No results found</div>');
+            } else {
+                // Loop through results and append to suggestions div
+                data.forEach(function (item) {
+                    var displayAddress = item.display_name;
+                    var lat = item.lat;
+                    var lon = item.lon;
+
+                    // Append each result as an option
+                    $suggestions.append(
+                        '<a href="#" class="list-group-item list-group-item-action" data-lat="' + lat + '" data-lon="' + lon + '">' + displayAddress + '</a>'
+                    );
+                });
+            }
+
+            // Show the suggestions box
+            $suggestions.removeClass('d-none');
+        });
+    }
+
+    // Handle clicking on a suggestion
+    $suggestions.on('click', 'a', function (e) {
+        e.preventDefault();
+
+        // Get the selected address and coordinates
+        var selectedAddress = $(this).text();
+        var latitude = $(this).data('lat');
+        var longitude = $(this).data('lon');
+
+        // Update the input field with the selected address
+        $input.val(selectedAddress);
+        $suggestions.empty().addClass('d-none'); // Hide suggestions
+
+        // Optionally, send the latitude and longitude to the server or update the URL
+        updateUrlWithLocation(latitude, longitude);
+    });
 
     // Function to update URL with latitude and longitude
     function updateUrlWithLocation(latitude, longitude) {
@@ -392,6 +477,184 @@ $('#location-select, #location-select-desktop').on('change', function() {
         var newUrl = currentUrl + '?latitude=' + latitude + '&longitude=' + longitude;
         history.replaceState({}, '', newUrl); // Update the URL without reloading the page
     }
+
+    var savedAddresses = []; // This will be fetched using AJAX
+
+    // Fetch saved addresses using AJAX when the page loads
+    $.ajax({
+        url: "{% url 'fetch_saved_addresses' %}",  // URL of the view you created
+        method: "GET",
+        success: function(data) {
+            savedAddresses = data;
+            updateDropdownWithSavedAddresses(); // Update dropdown with saved addresses
+        },
+        error: function(error) {
+            console.log("Error fetching saved addresses:", error);
+        }
+    });
+
+    // Detect real-time location on page load
+    function detectRealTimeLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                // Use reverse geocoding to convert coordinates into an address
+                var geocodingUrl = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + latitude + '&lon=' + longitude;
+
+                $.getJSON(geocodingUrl, function (data) {
+                    var currentAddress = data.display_name;
+
+                    // Display detected address in the input field
+                    $input.val(currentAddress);
+                    $input.prop('disabled', true); // Disable the input field for detected address
+                    $input.attr('placeholder', 'Location detected');
+                    updateUrlWithLocation(latitude, longitude);
+
+                    // If the dropdown is visible, update it with current location
+                    if (!$dropdown.hasClass('d-none')) {
+                      updateCurrentLocationOption(currentAddress);
+                    }
+                });
+            },
+            function (error) {
+                // Change the placeholder if location access is denied
+                $input.val('').attr('placeholder', 'User Denied Location Access');
+
+                // Remove the click event if it already exists to prevent multiple bindings
+                $input.off('click', detectRealTimeLocation);
+                
+                // Allow retrying location detection when clicking the input
+                $input.on('click', function() {
+                    $input.val(''); // Clear input on click to prompt for location again
+                    $input.attr('placeholder', 'Checking location...'); // Temporary placeholder
+                    detectRealTimeLocation(); // Retry detecting location
+                });
+            }
+        );
+    } else {
+        alert('Geolocation is not supported by this browser.');
+    }
+}
+
+// Function to update the current location option in the dropdown
+function updateCurrentLocationOption(currentAddress) {
+    // Check if the current location option already exists
+    var $currentLocationOption = $dropdown.find('option[value="current_location"]');
+
+    // Update or create the current location option
+    if ($currentLocationOption.length) {
+        // Update the text of the existing option
+        $currentLocationOption.text(`Current Location: ${currentAddress}`);
+    } else {
+        // Append a new option for the current location
+        $dropdown.append(new Option(`Current Location: ${currentAddress}`, "current_location"));
+    }
+}
+
+
+
+    // Update dropdown with saved addresses and search option
+    function updateDropdownWithSavedAddresses() {
+        if (savedAddresses.length > 0) {
+            // Convert the input to a dropdown if saved addresses are available
+            $input.addClass('d-none'); // Hide input field
+            $dropdown.removeClass('d-none'); // Show dropdown
+
+            // Populate the dropdown with saved addresses
+            savedAddresses.forEach(function (address) {
+                var displayAddress = address.street_address + ', ' + address.city + ', ' + address.state + ', ' + address.country;
+                // Prevent adding the same address multiple times
+                if (!$dropdown.find(`option[value="${address.id}"]`).length) {
+                    $dropdown.append(new Option(displayAddress, address.id));
+                }
+                updateUrlWithLocation(null, null); // No coordinates to send
+                // $('#select-icon-desktop').removeClass('d-none');
+            });
+
+            // Add the current location option if not already present
+            if (!$dropdown.find('option[value="current_location"]').length) {
+              
+                $dropdown.append(new Option(`Current Location: ${currentAddress}`, "current_location"));
+            }
+            
+
+            // Add the search option at the end
+            // if (!$dropdown.find('option[value="search"]').length) {
+            //     $dropdown.append(new Option("Search for address", "search"));
+            // }
+        } else {
+            // If no saved addresses, use real-time location detection
+            detectRealTimeLocation();
+        }
+    }
+
+    // Handle dropdown change to allow switching between manual entry and saved addresses
+    $dropdown.on('change', function() {
+        var selectedValue = $(this).val();
+        if (selectedValue === "current_location") {
+            detectRealTimeLocation(); // Re-trigger location detection
+        } 
+        // else if (selectedValue === "search") {
+        //     // Show input box for searching
+        //     $input.val('').prop('disabled', false).attr('placeholder', 'Search for address').focus();
+        //     $input.removeClass('d-none');
+        //     $dropdown.addClass('d-none'); // Hide dropdown
+        //     $suggestions.empty().addClass('d-none'); // Hide suggestions
+        // } 
+        else {
+            // Handle selection of saved address
+            var selectedAddress = $(this).find('option:selected').text();
+            $input.val(selectedAddress); // Update the input field with the selected address
+            // Optionally, send the selected address to the server or update the URL
+            updateUrlWithLocation(null, null); // No coordinates to send
+        }
+    });
+
+    // Handle search icon click
+    $('#search-icon-desktop').on('click', function() {
+        if ($input.prop('disabled')) {
+            $input.val('').prop('disabled', false).attr('placeholder', 'Search for address').focus();
+            $input.removeClass('d-none');
+            $dropdown.addClass('d-none'); // Hide dropdown
+            $('#search-icon-desktop').addClass('d-none');
+            $('#select-icon-desktop').removeClass('d-none');
+            $suggestions.empty().addClass('d-none');
+        }
+    });
+
+
+     // Handle select icon click
+     $('#select-icon-desktop').on('click', function() {
+        if (!$input.prop('disabled')) {
+            $input.val('').prop('disabled', true).attr('placeholder', 'Search for address').focus();
+            $input.addClass('d-none');
+            
+        }
+        $dropdown.removeClass('d-none'); // Hide dropdown
+            $('#search-icon-desktop').removeClass('d-none');
+            $('#select-icon-desktop').addClass('d-none');
+            $suggestions.empty().addClass('d-none');
+    });
+
+
+
+    // Function to update URL with latitude and longitude
+    function updateUrlWithLocation(latitude, longitude) {
+    var currentUrl = window.location.href.split('?')[0]; // Get current URL without query params
+    
+    // Check if both latitude and longitude are null
+    if (latitude === null && longitude === null) {
+        // Clean URL without any query params
+        history.replaceState({}, '', currentUrl);
+    } else {
+        // Construct the URL with latitude and longitude query params
+        var newUrl = currentUrl + '?latitude=' + latitude + '&longitude=' + longitude;
+        history.replaceState({}, '', newUrl); // Update the URL without reloading the page
+    }
+}
 
      // Function to update the href for each brand link with latitude and longitude
      function updateBrandLinksWithLocation(latitude, longitude) {

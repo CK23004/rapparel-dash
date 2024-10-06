@@ -238,7 +238,7 @@ Checkout - Rapparel
 <div class="container d-flex justify-content-center align-items-center mb-5 mt-5">
     <div class="text-center">
         <p class="fs-4">Please Log in to continue.</p>
-        <a href="{% url 'login' %}" class="btn btn-danger">Log In</a>
+        <a href="{% url 'login' %}?next={% url 'cart_checkout' %}" class="btn btn-danger">Log In</a>
     </div>
 </div>{% endif %}
 </section>

@@ -120,10 +120,7 @@
         display: flex;
         align-items: center;
       }
-      
-      #location-input-desktop {
-        width: 400px !important;
-      }
+    
 
       #location-icon-desktop i {
         font-size: 1rem !important; /* Adjust the icon size (equivalent to small text) */

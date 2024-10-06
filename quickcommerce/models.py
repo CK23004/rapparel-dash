@@ -107,6 +107,7 @@ class Store(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     owner_name = models.ForeignKey(User, on_delete=models.CASCADE)
     owner_contact = models.CharField(max_length=15)
+    owner_email = models.CharField(max_length=100)
     contact_person_name = models.CharField(max_length=255, blank=True, null=True)
     contact_person_number = models.CharField(max_length=15, blank=True, null=True)
     display_image = models.ImageField(upload_to='store_images/', blank=True, null=True)
@@ -152,10 +153,10 @@ class Banner(models.Model):
         ('secondary_three', 'Secondary Three'),
         # Add more places as needed
     ])
-    title = models.CharField(max_length=255, null=True, blank=True)
-    tagline = models.CharField(max_length=555, null=True, blank=True)
-    button_text = models.CharField(max_length=100, blank=True, null=True)
-    button_link = models.URLField(blank=True, null=True)
+    title = models.CharField(max_length=255, null=True, blank=True, default='')
+    tagline = models.CharField(max_length=555, null=True, blank=True, default='')
+    button_text = models.CharField(max_length=100, blank=True, null=True, default='')
+    button_link = models.URLField(blank=True, null=True, default='')
     image = models.ImageField(upload_to='banners/')
     link = models.URLField(blank=True, null=True)
     

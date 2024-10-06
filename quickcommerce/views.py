@@ -41,6 +41,7 @@ from django.views import View
 from django.views.decorators.http import require_GET, require_POST
 from django.utils import timezone
 from django.db import IntegrityError  # Import IntegrityError to handle duplicates
+from django.utils.http import url_has_allowed_host_and_scheme
 
 
 
@@ -273,12 +274,11 @@ class CategoryStoresView(View):
             try:
                 user_coords = (float(latitude), float(longitude))
             except ValueError:
-                return HttpResponseBadRequest('Invalid latitude or longitude format.')
+                return
         elif user_address_id:
             address = get_object_or_404(Address, id=user_address_id)
             user_coords = (address.latitude, address.longitude)
-        else:
-            return HttpResponseBadRequest('Latitude and longitude or address ID is required.')
+       
 
         # Fetch stores that belong to the category
         stores = Store.objects.filter(categories=category)
@@ -387,12 +387,10 @@ class BrandStoresView(View):
             try:
                 user_coords = (float(latitude), float(longitude))
             except ValueError:
-                return HttpResponseBadRequest('Invalid latitude or longitude format.')
+                return
         elif user_address_id:
             address = get_object_or_404(Address, id=user_address_id)
             user_coords = (address.latitude, address.longitude)
-        else:
-            return HttpResponseBadRequest('Latitude and longitude or address ID is required.')
 
         # Fetch stores that carry the brand
         stores = Store.objects.filter(brands=brand)
@@ -625,10 +623,10 @@ def product_detail_view(request, slug):
 
 
 # View Wishlist
-@login_required
-def view_wishlist(request):
-    wishlist = Wishlist.objects.filter(user=request.user)
-    return render(request, 'wishlist.html', {'wishlist': wishlist})
+# @login_required
+# def view_wishlist(request):
+#     wishlist = Wishlist.objects.filter(user=request.user)
+#     return render(request, 'wishlist.html', {'wishlist': wishlist})
 
 # Add to Wishlist
 @login_required
@@ -820,6 +818,31 @@ def search_products(request):
 
 #         return Response({'order_id': order.id, 'message': 'Order placed successfully'}, status=status.HTTP_201_CREATED)
 
+# class AddToCartView(View):
+#     def post(self, request, *args, **kwargs):
+#         # Ensure user is authenticated
+#         if not request.user.is_authenticated:
+#             messages.error(request, "Please log in to add items to your cart.")
+#             return redirect('login')  # Redirect to login if not authenticated
+
+#         # Retrieve the product ID and quantity from the POST request
+#         product_id = request.POST.get('product_id')
+#         quantity = int(request.POST.get('quantity', 1))  # Default to 1 if quantity is not provided
+
+#         # Get the product and the user's cart
+#         product = get_object_or_404(Product, id=product_id)
+#         cart, created = Cart.objects.get_or_create(user=request.user)
+
+#         # Add the product to the cart
+#         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+#         cart_item.quantity += quantity  # Increment quantity if item already exists
+#         cart_item.save()
+#         cart.save()
+
+
+#         # Redirect to cart page or any other page
+#         return redirect('cart_checkout')  # Redirect to the cart and checkout page
+
 class AddToCartView(View):
     def post(self, request, *args, **kwargs):
         # Ensure user is authenticated
@@ -835,39 +858,50 @@ class AddToCartView(View):
         product = get_object_or_404(Product, id=product_id)
         cart, created = Cart.objects.get_or_create(user=request.user)
 
+        # Check if there are existing items in the cart
+        if cart.cart_items.exists():
+            # Get the store of the new product
+            new_product_store = product.store
+
+            # Check the store of existing products in the cart
+            existing_store = cart.cart_items.first().product.store  # Get the store of the first existing product
+
+            # If the stores do not match, clear the cart
+            if existing_store != new_product_store:
+                cart.cart_items.all().delete()  # Clear the cart
+                messages.info(request, "Your cart has been cleared to add a new product from a different store.")
+
         # Add the product to the cart
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
         cart_item.quantity += quantity  # Increment quantity if item already exists
         cart_item.save()
         cart.save()
 
-
         # Redirect to cart page or any other page
-        return redirect('cart_checkout')  # Redirect to the cart and checkout page
+        return redirect('cart_checkout')
 
+# def send_order_confirmation_email(order, cart_items, user_email):
+#     # Prepare the email context with order and cart details
+#     context = {
+#         'order': order,
+#         'cart_items': cart_items,
+#         'total_amount': order.total_amount,
+#         'address': order.address,
+#     }
 
-def send_order_confirmation_email(order, cart_items, user_email):
-    # Prepare the email context with order and cart details
-    context = {
-        'order': order,
-        'cart_items': cart_items,
-        'total_amount': order.total_amount,
-        'address': order.address,
-    }
+#     # Render the HTML email template
+#     html_content = render_to_string('emails/order_confirmation.html', context)
+#     text_content = strip_tags(html_content)  # Fallback to plain text if HTML is not supported
 
-    # Render the HTML email template
-    html_content = render_to_string('emails/order_confirmation.html', context)
-    text_content = strip_tags(html_content)  # Fallback to plain text if HTML is not supported
+#     # Create the email message
+#     subject = f"Order Confirmation - #{order.id}"
+#     from_email = settings.DEFAULT_FROM_EMAIL
+#     recipient_list = [user_email, settings.ADMIN_EMAIL]
 
-    # Create the email message
-    subject = f"Order Confirmation - #{order.id}"
-    from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [user_email, settings.ADMIN_EMAIL]
-
-    # Send the email to both user and admin
-    email = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
-    email.attach_alternative(html_content, "text/html")
-    email.send()
+#     # Send the email to both user and admin
+#     email = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
+#     email.attach_alternative(html_content, "text/html")
+#     email.send()
 
 
 
@@ -1185,7 +1219,9 @@ def place_order_ajax(request):
                 pin_code=address.postal_code,
                 country=address.country,
                 total_amount=total_amount,
-                order_status='pending',
+                store= cart_items[0].product.store,
+                delivery_status = 'Pending',
+                order_status='Pending',
                 payment_status='Pending'
             )
 
@@ -1212,8 +1248,52 @@ def place_order_ajax(request):
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'order_confirmation.html', {'order': order})
 
+    # Prepare email content for customer
+    subject = f'Order Confirmation - Order #{order.id}'
+    email_template_name = 'emails/order_confirmation.html'
+    customer_support = settings.SUPPORT_EMAIL
+    email_content = render_to_string(email_template_name, {'order': order, 'customer_support': customer_support})
+
+    # Send email to customer
+    send_mail(
+        subject,
+        '',  # Plain text version (can be left empty or set to None)
+        settings.DEFAULT_FROM_EMAIL,  # Replace with your email
+        [request.user.email],
+        fail_silently=False,
+        html_message=email_content  # HTML version
+    )
+
+    # Prepare email content for admin/store owner
+    admin_subject = f'New Order Notification - Order #{order.id}'
+    admin_email_template_name = 'emails/new_order_notification.html'
+    admin_email_content = render_to_string(admin_email_template_name, {'order': order})
+    # Send email to admin and store owner
+    send_mail(
+        admin_subject,
+        '',  # Plain text version (can be left empty or set to None)
+        settings.DEFAULT_FROM_EMAIL,  # Replace with your email
+        [settings.ADMIN_EMAIL],  # List of recipients
+        fail_silently=False,
+        html_message=admin_email_content  # HTML version
+    )
+
+    # Check if the store and owner's email are available
+    if order.store and order.store.owner_email:
+        store_owner_email = order.store.owner_email
+
+        # Send email to store owner
+        send_mail(
+            admin_subject,
+            '',  # Plain text version (can be left empty or set to None)
+            settings.DEFAULT_FROM_EMAIL,  # Replace with your email
+            [store_owner_email],
+            fail_silently=False,
+            html_message=admin_email_content  # HTML version
+        )
+
+    return render(request, 'order_confirmation.html', {'order': order})
 
 
 
@@ -1373,7 +1453,15 @@ def signup_view(request):
             'token': token,
             'verification_link': full_link
         })
-        send_mail(mail_subject, message, settings.EMAIL_HOST_USER, [email])
+        email_message = EmailMultiAlternatives(
+        mail_subject, message, settings.DEFAULT_FROM_EMAIL, [email]
+        )
+    
+        # Add HTML content
+        email_message.attach_alternative(message, "text/html")
+        
+        # Send the email
+        email_message.send()
 
         messages.success(request, 'Please confirm your email to complete registration.')
         return redirect('login')  # Redirect to login after signup
@@ -1409,9 +1497,17 @@ def login_view(request):
         if user is not None:
             # If authentication is successful, log the user in
             login(request, user)
-            if (login):
-                print(True)
-            return redirect('landing_page')  # Redirect to homepage or any protected page
+            # Get the 'next' parameter from the query string
+            next_url = request.GET.get('next')
+            print(next_url)
+            # Ensure the URL is safe (prevents open redirect vulnerabilities)
+            # if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            #     return redirect(next_url)
+            if next_url:
+                return redirect(next_url)
+            else:
+                print('home page redirect')
+                return redirect('landing_page')
         else:
             # If authentication fails, show an error message
             messages.error(request, 'Invalid email or password.')
@@ -2234,3 +2330,108 @@ def category(request):
 
 def store(request):
     return render(request, 'store_base.html')
+
+
+
+
+
+
+
+
+#dashboard views
+@login_required
+def base_dash(request):
+    return render(request, 'dashboard/base_dash.html')
+
+
+@login_required
+def customer_profile(request):
+    user = request.user
+
+    # Get the user's group (role)
+    user_groups = user.groups.all()
+    user_role = user_groups[0].name if user_groups.exists() else 'No Role Assigned'
+
+    if request.method == 'POST':
+        # Get the submitted data
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+
+        # Validate data (you can add more validation logic here)
+        if not email or not phone_number or not first_name or not last_name:
+            messages.error(request, 'All fields are required.')
+            return render(request, 'dashboard/customer_profile.html', {'user': user, 'user_role': user_role})
+
+        try:
+            # Update user details
+            user.email = email
+            user.phone_number = phone_number
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+
+            messages.success(request, 'Your account details were updated successfully!')
+            return redirect('customer_profile')
+        
+        except IntegrityError:
+            # Handle the duplicate email error
+            messages.error(request, 'This email is already registered with another account.')
+            return render(request, 'dashboard/customer_profile.html', {'user': user, 'user_role': user_role})
+
+    return render(request, 'dashboard/customer_profile.html', {'user': user, 'user_role': user_role})
+
+
+@login_required
+def customer_past_orders(request):
+    # Check if the logged-in user belongs to the 'Customer' group
+        # Fetch all orders for the logged-in customer
+        orders = Order.objects.filter(user=request.user).order_by('-placed_at')
+
+        context = {
+            'orders': orders,
+        }
+        return render(request, 'dashboard/customer_past_orders.html', context)
+  
+    
+
+@login_required
+def customer_wishlist(request):
+    wishlist = Wishlist.objects.filter(user=request.user)
+    return render(request, 'dashboard/customer_wishlist.html', {'wishlist': wishlist})
+    
+
+@login_required
+def create_return_request(request, order_item_id):
+    order_item = get_object_or_404(OrderItem, id=order_item_id, order__user=request.user)
+
+    # Check if a return request already exists
+    existing_request = ReturnRequest.objects.filter(order_item=order_item).first()
+    if existing_request:
+        return JsonResponse({'success': False, 'message': 'Return request already exists.'})
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        if reason:
+            # Create a new return request
+            return_request = ReturnRequest.objects.create(
+                order_item=order_item,
+                reason=reason
+            )
+            return JsonResponse({'success': True, 'message': 'Return request created successfully.'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Please provide a reason for return.'})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+
+@login_required
+def customer_return_requests(request):
+    # Fetch return requests for the logged-in user's orders
+    return_requests = ReturnRequest.objects.filter(order_item__order__user=request.user)
+
+    context = {
+        'return_requests': return_requests,
+    }
+    return render(request, 'dashboard/customer_return_requests.html', context)

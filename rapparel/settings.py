@@ -21,11 +21,12 @@ import os
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'  # Your SMTP server
-EMAIL_PORT = 587  # SMTP port
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587  # TLS port
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '7ccf54001@smtp-brevo.com'
-EMAIL_HOST_PASSWORD = '4ny9GH1MgcbEU62w'
+EMAIL_USE_SSL = False  # Set to False when using TLS
+EMAIL_HOST_USER = '7ccf54001@smtp-brevo.com'  # Your Brevo login
+EMAIL_HOST_PASSWORD = '4ny9GH1MgcbEU62w'  # Your Brevo SMTP password
 DEFAULT_FROM_EMAIL = 'info@rapparelsolutions.com'
 ADMIN_EMAIL = 'info@rapparelsolutions.com'
 SUPPORT_EMAIL = 'info@rapparelsolutions.com'  # Used in the email template
@@ -47,13 +48,13 @@ SECRET_KEY = 'django-insecure-^*3ong@!=4^anv_=44s&7iyo40%d_^-hlh)k1*^_#!!kk3&vz+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app','*','192.168.104.67']
+ALLOWED_HOSTS = ['.vercel.app','*' ,'zany-space-cod-7j49q7vqgj42rgv-8000.app.github.dev','192.168.104.67']
 # settings.py
 AUTH_USER_MODEL = 'quickcommerce.User'
 
 #for soft dashboard
-LOGIN_REDIRECT_URL = '/'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# LOGIN_REDIRECT_URL = '/'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Application definition
 
 #for jet

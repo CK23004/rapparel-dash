@@ -8,7 +8,7 @@
     <h4 class="text-center mb-4">Login</h4>
     <p class="text-center text-muted mb-4">Enter your email and password to log in</p>
 
-    <form id="loginForm" method="post" action="{% url 'login' %}">
+    <form id="loginForm" method="post" action="{% url 'login' %}?next={{ request.GET.next }}">
         {% csrf_token %}
         <!-- Email Input -->
         <div class="mb-3">

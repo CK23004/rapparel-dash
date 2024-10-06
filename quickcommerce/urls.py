@@ -78,7 +78,7 @@ urlpatterns = [
 
     path('signup/', signup_view, name='signup'),
     path('activate/<uidb64>/<token>/', activate_account, name='activate'),
-    path('login/', login_view, name='login'),
+    path('accounts/login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('password-reset/', PasswordResetView.as_view(), name='password_reset'),
     path('password-reset/done/', TemplateView.as_view(template_name="registration/password_reset_done.html"), name='password_reset_done'),
@@ -90,7 +90,7 @@ urlpatterns = [
     path('category/<slug:category_slug>/', CategoryStoresView.as_view(), name='category_stores'),
     path('brand/<slug:brand_slug>/', BrandStoresView.as_view(), name='brand_stores'),
     path('product/<slug:slug>/', product_detail_view, name='product_detail'),
-    path('wishlist/', view_wishlist, name='view_wishlist'),  # View the wishlist
+    # path('wishlist/', view_wishlist, name='view_wishlist'),  # View the wishlist
     path('wishlist/add/<slug:product_slug>/', add_to_wishlist, name='add_to_wishlist'),  # Add to wishlist
     path('wishlist/remove/<slug:product_slug>/', remove_from_wishlist, name='remove_from_wishlist'),  # Remove from wishlist
     path('search/', search_products, name='search_products'),  # URL for product search
@@ -105,7 +105,13 @@ urlpatterns = [
     path('myaccount/', edit_account, name='edit_account'),
 
 
-
+#dashboard urls
+    path('dashboard/home/',base_dash, name='base_dash'),
+    path('customer/profile/',customer_profile, name='customer_profile'),
+    path('customer/orders/',customer_past_orders, name='customer_past_orders'),
+    path('customer/wishlist/',customer_wishlist, name='customer_wishlist'),
+    path('returns/request/<uuid:order_item_id>/', create_return_request, name='create_return_request'),
+    path('customer/returns/', customer_return_requests, name='customer_return_requests'),
 
 
 

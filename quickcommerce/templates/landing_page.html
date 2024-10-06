@@ -10,13 +10,21 @@ Home - Rapparel
   <div class="hero-section position-relative content-container mt-4">
     {% if primary_banner %}
       <img src="{{ primary_banner.image.url }}" alt="Banner" class="img-fluid">
+      
+
       <div class="carousel-caption">
+        {% if primary_banner.title %}
         <h1>{{ primary_banner.title }}</h1>
+        {% endif %}
+        {% if primary_banner.tagline %}
         <p>{{ primary_banner.tagline }}</p>
-        {% if primary_banner.button_link %}
+        {% endif %}
+        {% if primary_banner.button_link %} 
+        {% if primary_banner.button_text %}
         <a href="{{ primary_banner.button_link }}" class="btn btn-danger">{{ primary_banner.button_text }}</a>
-      {% endif %}
+        {% endif %}{% endif %}
       </div>
+
     {% else %}
       <img src="https://via.placeholder.com/1200x500" alt="Banner" class="img-fluid">
     {% endif %}

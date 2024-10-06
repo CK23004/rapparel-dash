@@ -120,10 +120,7 @@
         display: flex;
         align-items: center;
       }
-      
-      #location-input-desktop {
-        width: 400px !important;
-      }
+    
 
       #location-icon-desktop i {
         font-size: 1rem !important; /* Adjust the icon size (equivalent to small text) */
@@ -153,7 +150,9 @@
         border-bottom-left-radius: 20px;
          border-bottom-right-radius: 0;
        } */
-        
+       #search-form {
+        display: none !important;
+    }
       
       /* Font icon size and color change on hover */
       .navbar .bi {

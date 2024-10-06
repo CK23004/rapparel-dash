@@ -1,25 +1,11 @@
-{% extends 'base_index.html' %}
+{% extends 'dashboard/customer_dash.html' %}
 
-{% block title %}Account Details{% endblock %}
+{% block title %}My Profile{% endblock %}
 
-{% block content %}
-<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+{% block account_content %}
 
 <style>
-     /* .form-container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 50rem;
-            width: 100%;
-        } */
-.message-container {
-    width: 100%;
-    max-width: 50rem; /* Same width as the form for consistency */
-    margin-bottom: 20px; /* Adds some space between the messages and the form */
-}
-
+   
 
 @media(max-width:760px){
     .form-container{
@@ -27,19 +13,19 @@
     }
 }
 </style>
-<div class="container mt-5 mb-5">
+<div class="container mt-4 mb-5">
    
 
     <!-- Display form for editing user account details -->
-    <div class="form-container">
-        <h2>Account Details</h2>
+        <h3 class="mb-4">Edit Your Profile</h3>
+
         
         <!-- Display User Role -->
         <div class="mb-3">
-            <label><strong>Your Role:</strong></label>
-            <p>{{ user_role }}</p>
+            <label><strong>Your Role:</strong> {{ user_role }}</label>
+            
         </div>
-        <form method="POST" action="{% url 'edit_account' %}">
+        <form method="POST" action="{% url 'customer_profile' %}">
             {% csrf_token %}
             <div class="form-group mb-3">
                 <label for="first_name">First Name:</label>
@@ -61,10 +47,8 @@
             
             <button type="submit" class="btn btn-primary">Update Details</button>
         </form>
-    </div>
 
     
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
